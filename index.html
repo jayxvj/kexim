@@ -152,45 +152,6 @@
       border-radius: 16px;
     }
   </style>
-
-  <!-- ================= BOT / SCRAPER PROTECTION ================= -->
-  <script>
-    (() => {
-      /* Block headless browsers & scrapers */
-      if (
-        navigator.webdriver ||
-        !navigator.languages ||
-        navigator.languages.length === 0 ||
-        !window.chrome
-      ) {
-        document.documentElement.innerHTML = 'Access Denied';
-      }
-
-      /* Anti-inspect / devtools */
-      document.addEventListener('contextmenu', e => e.preventDefault());
-      document.addEventListener('keydown', e => {
-        if (
-          e.key === 'F12' ||
-          (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) ||
-          (e.ctrlKey && e.key === 'U')
-        ) {
-          e.preventDefault();
-        }
-      });
-
-      /* Human interaction check */
-      let interactions = 0;
-      ['mousemove', 'scroll', 'keydown', 'touchstart'].forEach(evt =>
-        document.addEventListener(evt, () => interactions++)
-      );
-
-      setTimeout(() => {
-        if (interactions < 5) {
-          document.body.innerHTML = 'Automated access blocked.';
-        }
-      }, 6000);
-    })();
-  </script>
 </head>
 
 <body class="bg-white text-slate-900">
