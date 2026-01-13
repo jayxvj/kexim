@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://api.emailjs.com;
+      style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+      img-src 'self' https: data:;
+      font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+      connect-src https://api.emailjs.com;
+      frame-src https://maps.google.com https://www.google.com;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    ">
+
+  <title>Kexim</title>
+  <link rel="icon" type="image/png" href="https://i.ibb.co/BHcDddLg/Chat-GPT-Image-Jan-10-2026-10-29-02-PM.png">
+
+  <!-- Tailwind (Required CDN) -->
+  <script>
+    // Tailwind v4 browser config
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: '#006b38',
+            gold: '#ffcc00',
+            ink: '#0b1220',
+            slate: '#0f172a'
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- EmailJS (for sending contact form to your email) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    :root {
+      --forest: #006b38;
+      --gold: #ffcc00;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+    }
+
+    /* Subtle grid texture for corporate feel */
+    .bg-grid {
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, .06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, .06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* Hero background */
+    .hero-bg {
+      background-image:
+        radial-gradient(1200px 500px at 50% 0%, rgba(255, 204, 0, .18), transparent 60%),
+        linear-gradient(180deg, rgba(0, 0, 0, .72), rgba(0, 0, 0, .62)),
+        url('https://images.unsplash.com/photo-1598193956767-5f45a6307639?auto=format&fit=crop&w=2400&q=80');
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Parallax-ish CTA (safe mobile fallback) */
+    .cta-bg {
+      background-image:
+        linear-gradient(180deg, rgba(0, 0, 0, .65), rgba(0, 0, 0, .55)),
+        url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=2400&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    @media (max-width: 768px) {
+      .cta-bg {
+        background-attachment: scroll;
+      }
+    }
+
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Navbar transitions */
+    .nav-transparent {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .nav-solid {
+      background: rgb(255, 238, 0);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, .08);
+    }
+
+    /* nicer focus states */
+    :focus-visible {
+      outline: 3px solid rgba(255, 204, 0, .65);
+      outline-offset: 3px;
+    }
+
+    /* card hover */
+    .lift {
+      transition: transform .35s ease, box-shadow .35s ease;
+    }
+
+    .lift:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px rgba(2, 8, 23, .10);
+    }
+
+    /* for gradient border effect */
+    .gradient-ring {
+      background: linear-gradient(135deg, rgba(0, 107, 56, .25), rgba(255, 204, 0, .28));
+      padding: 1px;
+      border-radius: 16px;
+    }
+  </style>
+
+  <!-- ================= BOT / SCRAPER PROTECTION ================= -->
+  <script>
+    (() => {
+      /* Block headless browsers & scrapers */
+      if (
+        navigator.webdriver ||
+        !navigator.languages ||
+        navigator.languages.length === 0 ||
+        !window.chrome
+      ) {
+        document.documentElement.innerHTML = 'Access Denied';
+      }
+
+      /* Anti-inspect / devtools */
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      document.addEventListener('keydown', e => {
+        if (
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) ||
+          (e.ctrlKey && e.key === 'U')
+        ) {
+          e.preventDefault();
+        }
+      });
+
+      /* Human interaction check */
+      let interactions = 0;
+      ['mousemove', 'scroll', 'keydown', 'touchstart'].forEach(evt =>
+        document.addEventListener(evt, () => interactions++)
+      );
+
+      setTimeout(() => {
+        if (interactions < 5) {
+          document.body.innerHTML = 'Automated access blocked.';
+        }
+      }, 6000);
+    })();
+  </script>
+</head>
+
+<body class="bg-white text-slate-900">
+  
+  <!-- LEGAL WATERMARK -->
+  <div style="display:none">
+    © Kosmos Exim. Automated scraping, cloning, or data extraction is prohibited.
+  </div>
+  
+  <!-- NAVBAR -->
+  <nav id="navbar" class="fixed inset-x-0 top-0 z-50 transition-all duration-500 nav-transparent">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-20 items-center justify-between">
+        <!-- Brand -->
+        <a href="#home" class="group flex items-center gap-3" aria-label="Kosmos Exim home">
+          <div
+            class="relative grid h-11 w-11 place-items-center rounded-xl bg-white/10 ring-1 ring-white/15 transition group-hover:bg-white/15">
+            <!-- Simple Compass + Globe mark (inline SVG) -->
+            <img src="https://i.ibb.co/BHcDddLg/Chat-GPT-Image-Jan-10-2026-10-29-02-PM.png">
+          </div>
+          <div class="leading-tight">
+            <div class="text-base font-bold tracking-tight text-white">Kosmos <span class="text-gold">Exim</span></div>
+            <div class="text-xs text-white/75">Import • Export • Logistics</div>
+          </div>
+        </a>
+
+        <!-- Desktop Links -->
+        <div class="hidden md:flex items-center gap-8">
+          <div class="flex items-center gap-7">
+            <a class="nav-link text-sm font-medium text-white/90 hover:text-white transition" href="#home">Home</a>
+            <a class="nav-link text-sm font-medium text-white/90 hover:text-white transition"
+              href="#products">Products</a>
+            <a class="nav-link text-sm font-medium text-white/90 hover:text-white transition"
+              href="#services">Services</a>
+            <a class="nav-link text-sm font-medium text-white/90 hover:text-white transition" href="#reach">Global
+              Reach</a>
+            <a class="nav-link text-sm font-medium text-white/90 hover:text-white transition"
+              href="#contact">Contact</a>
+          </div>
+          <a href="#contact"
+            class="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-green-400 shadow-sm transition hover:brightness-95">
+            Get a Quote
+          </a>
+        </div>
+
+        <!-- Mobile button -->
+        <button id="mobileBtn"
+          class="md:hidden inline-flex items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15 px-3 py-2 text-white hover:bg-white/15"
+          aria-label="Open menu" aria-expanded="false">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileDrawer" class="hidden md:hidden">
+      <div class="bg-white/95 backdrop-blur-lg shadow-xl border-t border-black/5">
+        <div class="mx-auto max-w-7xl px-4 py-4">
+          <div class="grid gap-2">
+            <a class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+              href="#home">Home</a>
+            <a class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+              href="#products">Products</a>
+            <a class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+              href="#services">Services</a>
+            <a class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+              href="#reach">Global Reach</a>
+            <a class="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-100"
+              href="#contact">Contact</a>
+            <a class="mt-2 inline-flex items-center justify-center rounded-full bg-gold px-5 py-2.5 text-sm font-bold text-forest"
+              href="#contact">Get a Quote</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header id="home" class="hero-bg relative min-h-[92vh] pt-20">
+    <div class="absolute inset-0 bg-grid opacity-40"></div>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-20">
+        <div class="reveal">
+          <div
+            class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/15">
+            <span class="inline-block h-2 w-2 rounded-full bg-gold"></span>
+            Trusted global sourcing & trade execution
+          </div>
+          <h1 class="mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            Navigating Global Trade with <span class="text-gold">Precision</span>
+          </h1>
+          <p class="mt-5 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg">
+            Your trusted partner in seamless import and export solutions—built on compliance, speed, and a dependable
+            global network.
+          </p>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="#contact"
+              class="inline-flex items-center justify-center rounded-full bg-gold px-7 py-3 text-sm font-bold text-forest shadow-lg shadow-black/20 transition hover:brightness-95">
+              Contact Sales
+              <i class="fa-solid fa-arrow-right ml-2"></i>
+            </a>
+            <a href="#products"
+              class="inline-flex items-center justify-center rounded-full bg-white/10 px-7 py-3 text-sm font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15">
+              Explore Products
+              <i class="fa-regular fa-compass ml-2"></i>
+            </a>
+          </div>
+
+          <div class="mt-10 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
+              <div class="text-white font-semibold">Compliance-first</div>
+              <div class="text-white/70 text-sm mt-1">Documentation, customs, and HS classification support.</div>
+            </div>
+            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
+              <div class="text-white font-semibold">Fast execution</div>
+              <div class="text-white/70 text-sm mt-1">Reliable timelines with proactive tracking updates.</div>
+            </div>
+            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
+              <div class="text-white font-semibold">Global network</div>
+              <div class="text-white/70 text-sm mt-1">Vetted suppliers and logistics partners worldwide.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal">
+          <div class="gradient-ring">
+            <div class="rounded-2xl bg-white p-6 sm:p-7">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold text-forest">Kosmos Exim</div>
+                  <div class="text-xl font-bold tracking-tight text-green-700">Trade Snapshot</div>
+                </div>
+                <div
+                  class="inline-flex items-center gap-2 rounded-full bg-forest/10 px-3 py-1.5 text-xs font-semibold text-forest">
+                  <span class="inline-block h-2 w-2 rounded-full bg-forest"></span>
+                  *****
+                </div>
+              </div>
+
+              <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                <div class="rounded-xl bg-slate-50 p-4">
+                  <div class="text-xs font-semibold text-slate-500">Typical Shipping Modes</div>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <span
+                      class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-800 ring-1 ring-slate-200"><i
+                        class="fa-solid fa-ship mr-2 text-forest"></i>Ocean</span>
+                    <span
+                      class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-800 ring-1 ring-slate-200"><i
+                        class="fa-solid fa-plane mr-2 text-forest"></i>Air</span>
+                    <span
+                      class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-800 ring-1 ring-slate-200"><i
+                        class="fa-solid fa-truck mr-2 text-forest"></i>Land</span>
+                  </div>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                  <div class="text-xs font-semibold text-slate-500">Quality & Assurance</div>
+                  <ul class="mt-2 space-y-2 text-sm text-slate-700">
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-forest"></i>Pre-shipment
+                      inspection coordination</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-forest"></i>Supplier
+                      verification & documentation</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-forest"></i>End-to-end tracking
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="mt-5 rounded-xl border border-slate-200 p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-xs font-semibold text-slate-500">Next step</div>
+                    <div class="text-sm font-semibold text-slate-900">Tell us what you want to import/export</div>
+                  </div>
+                  <a href="#contact"
+                    class="rounded-full bg-forest px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900 transition">
+                    Request Quote
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ABOUT / WHY -->
+  <section id="about" class="bg-slate-50 py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="reveal text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-green-700 sm:text-4xl">Why Choose Kosmos Exim</h2>
+        <p class="mt-3 text-slate-600 max-w-2xl mx-auto">A modern trade partner focused on execution, transparency, and
+          long-term relationships.</p>
+      </div>
+
+      <div class="mt-12 grid gap-6 md:grid-cols-3">
+        <div class="lift rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 reveal">
+          <div class="flex items-center gap-4">
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-forest">
+              <i class="fa-solid fa-ship text-gold"></i>
+            </div>
+            <div>
+              <div class="text-lg font-bold text-green-700">Reliability</div>
+              <div class="text-sm text-slate-600">Stable supply, clear paperwork, and consistent delivery timelines.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lift rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 reveal">
+          <div class="flex items-center gap-4">
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-forest">
+              <i class="fa-solid fa-plane text-gold"></i>
+            </div>
+            <div>
+              <div class="text-lg font-bold text-green-700">Speed</div>
+              <div class="text-sm text-slate-600">Fast quotes, rapid coordination, and proactive milestone updates.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lift rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200 reveal">
+          <div class="flex items-center gap-4">
+            <div class="grid h-12 w-12 place-items-center rounded-xl bg-forest">
+              <i class="fa-solid fa-handshake text-gold"></i>
+            </div>
+            <div>
+              <div class="text-lg font-bold text-green-700">Global Network</div>
+              <div class="text-sm text-slate-600">Vetted partners across sourcing, freight, and customs brokerage.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS (Filterable) -->
+  <section id="products" class="py-16 sm:py-20 bg-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="reveal flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div>
+          <h2 class="text-3xl font-bold tracking-tight text-green-700 sm:text-4xl">Products</h2>
+          <p class="mt-2 text-slate-600 max-w-2xl">Explore our key categories. Use filters to quickly find what you
+            trade.</p>
+        </div>
+        <div class="flex flex-wrap gap-2" aria-label="Product category filters">
+          <button class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-800"
+            data-filter="all">All</button>
+          <button
+            class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
+            data-filter="agri">Agriculture</button>
+          <button
+            class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
+            data-filter="fruit">Fruits</button>
+          <button
+            class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
+            data-filter="puge">Pulses | Legumes</button>
+          <button
+            class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
+            data-filter="spice">Spices</button>
+          <button
+            class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
+            data-filter="process">Processed</button>
+        </div>
+      </div>
+
+      <div id="productsGrid" class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+        <!-- Agriculture -->
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="agri">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1621956838481-f8f616950454');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Agro Commodities</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Agriculture
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Reliable supply of export-ready agricultural commodities with consistent quality.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="agri">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1686820740687-426a7b9b2043');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Rice</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Agriculture
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              High-grade rice varieties processed, sorted, and packed with strict quality control for global markets.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="agri">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1437252611977-07f74518abd7');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Wheat</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Agriculture
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Carefully processed wheat with uniform grains, moisture control, and export-compliant packaging.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="agri">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1705146640695-cab3aa2005f4');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Barley</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Agriculture
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Carefully processed barley with uniform grains, controlled moisture, and export-ready packaging.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="agri">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://currentaffairs.adda247.com/wp-content/uploads/multisite/sites/5/2026/01/02114519/Which-Crop-is-known-as-the-Poor-Mans-Crop.webp');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Millets</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Agriculture
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Carefully processed bajra, jowar, and ragi with uniform quality, controlled moisture, and export-ready
+              packaging.
+            </p>
+          </div>
+        </article>
+
+
+
+
+
+
+
+        <!-- Pulses -->
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="puge">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1621956838481-f8f616950454');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Pulses & Legumes</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Pulses | Legumes
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Premium pulses and legumes with uniform quality and export-compliant packaging.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="puge">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1671130295987-13d3b3b4e9dc');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Lentils</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Pulses | Legumes
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Carefully processed lentils with uniform size, controlled moisture, and export-ready packaging.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="puge">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1675237625827-38268aafc571');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Chickpeas</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Pulses | Legumes
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Carefully processed Chana (chickpeas) with uniform size, low moisture, and export-compliant packaging.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="puge">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1612869538502-b5baa439abd7');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Pegion Peas</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Pulses | Legumes
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Carefully processed Toor Dal (pegion peas) with uniform grain size, controlled moisture, and export-ready
+              packaging.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="puge">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://5.imimg.com/data5/SELLER/Default/2023/1/HK/SP/SO/149187824/mung-dal-1-500x500.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Green Grams</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Pulses | Legumes
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Carefully processed Moong Dal (green grams) with uniform grains, controlled moisture, and export-ready
+              packaging.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="puge">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://5.imimg.com/data5/SELLER/Default/2023/3/CW/BN/BO/42130148/pulses-urad-dal-500x500.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Black Grams</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Pulses | Legumes
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Carefully processed Urad Dal (black grams) with uniform grains, controlled moisture, and export-ready
+              packaging.
+            </p>
+          </div>
+        </article>
+
+
+
+
+
+
+
+        <!-- Fruits -->
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="fruit">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1610832958506-aa56368176cf');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Fruits</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Fruit
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              High-quality fruits with controlled ripeness, hygienic handling, and export-compliant packaging.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="fruit">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1724255863045-2ad716767715');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Mango</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Fruit
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Premium-quality mangoes sourced from trusted orchards, carefully graded and packed for international
+              export standards.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="fruit">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1724250081106-4bb1be9bf950');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Banana</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Fruit
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Fresh bananas sourced from trusted farms, carefully graded and packed to meet international export
+              standards.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="fruit">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1606757389723-23c4bf501fba');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Apple</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Fruit
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Fresh apples sourced from reliable orchards, carefully graded and packed to meet international export
+              standards.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="fruit">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1724250450261-80b25f8e3fab');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Grapes</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Fruit
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Fresh grapes sourced from trusted vineyards, carefully graded and packed to meet international export
+              standards.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="fruit">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1609424572698-04d9d2e04954');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Orange</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Fruit
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Fresh oranges sourced from trusted orchards, carefully graded and packed to meet international export
+              standards.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="fruit">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1723369640348-f7b92c06c878');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Jack Fruit</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Fruit
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Fresh jackfruit sourced from trusted farms, carefully selected and packed to meet international export
+              standards.
+            </p>
+          </div>
+        </article>
+
+
+
+
+
+
+
+        <!-- Spices -->
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1716816211590-c15a328a5ff0');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Spices</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Ground x Premuim
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Cleaned, graded, and export-ready batches with documentation.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1726862790171-0d6208559224');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Turmeric</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Whole & Ground
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural turmeric made from dried turmeric roots.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1607672632458-9eb56696346b');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Red Chilli</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Whole & Ground
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural red chilli made from dried red chilli peppers.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://plus.unsplash.com/premium_photo-1668446314011-301c7a98b6a9');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Black Pepper</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Whole & Ground
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural black pepper made from dried pepper berries.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://m.media-amazon.com/images/I/71R6kzsaLuL._AC_UF1000,1000_QL80_.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Coriander Seeds</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Whole & Ground
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural coriander seeds made from dried coriander grains.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1601723897386-e5df0c749fb7');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Cumin Seeds</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Whole & Ground
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural cumin seeds made from dried cumin grains.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://dakshinspices.com/wp-content/uploads/2024/05/fennel-seeds-1.png');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Fennel Seeds</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Whole & Ground
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural fennel seeds made from dried fennel grains.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/blogs/2147582967/images/3b0cc1a-fa0-18a0-382-dae207400675_fenugreek-uses-03.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Fenugreek</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Whole & Ground
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural fenugreek made from dried fenugreek seeds.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://cdn.shortpixel.ai/spai/q_lossy+ret_img+to_webp/www.tilda.com/wp-content/uploads/2022/01/Cardamom@2440x1200px.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Cardamom</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Premium | Aromatic
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural cardamom made from dried cardamom pods.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://cdn.shortpixel.ai/spai/q_+w_1220+to_webp+ret_img/www.tilda.com/wp-content/uploads/sites/8/2022/01/07152703/Cloves-1.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Cloves</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Premium | Aromatic
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural clove made from dried clove buds.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://cdn.shortpixel.ai/spai/q_+w_970+to_webp+ret_img/www.tilda.com/wp-content/uploads/sites/8/2022/01/14125115/Garam-masala@2440x1200px-1.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Cinnamon</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Premium | Aromatic
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural cinnamon made from dried cinnamon bark.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://spicesofkollihills.in/wp-content/uploads/2024/07/lovepik-star-anise-picture_501322131.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Star Anise</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Premium | Aromatic
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural star anise made from dried star-shaped pods.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="spice">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://www.greendna.in/cdn/shop/products/freshbayleaves_1024x1024@2x.jpg?v=1663229633');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Bay Leaf</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Premium | Aromatic
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              100% natural bay leaves made from dried bay leaves.
+            </p>
+          </div>
+        </article>
+
+
+
+
+
+
+
+        <!-- Processed -->
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="process">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://images.unsplash.com/photo-1699666397768-0126340e880a');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Processed Foods</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Processed
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Export-ready processed foods with quality control and documentation.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="process">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://m.media-amazon.com/images/I/41pYMKBTn5L.jpg');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Jackfruit Chips</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Processed
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Made from fresh, ripe jackfruit slices, gently baked in Dehydrate Machine and light
+              seasoning.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="process">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://www.govindjee.store/cdn/shop/products/BANANA-WAFERS-SALTED-594651.jpg?v=1696765314&width=750');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Banana Chips</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Processed
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Made from fresh raw bananas, sliced and baked in Dehydrate Machine, lightly seasoned for taste.
+            </p>
+          </div>
+        </article>
+
+        <article class="product-card lift reveal rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white"
+          data-category="process">
+          <div class="h-44 bg-cover bg-center"
+            style="background-image: url('https://www.govindjee.store/cdn/shop/products/ragi-chipsfinger-millet-chips-686291.jpg?v=1710799627&width=750');">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-green-700">Millet Chips</h3>
+              <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">
+                Processed
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600">
+              Made from selected millet flour, blended with natural spices, and baked in Dehydrate Machine.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <div
+        class="reveal mt-10 rounded-2xl bg-slate-50 ring-1 ring-slate-200 p-6 sm:p-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div class="text-sm font-semibold text-slate-900">Need a specific item?</div>
+          <div class="text-sm text-slate-600">Share your target specs and destination—our team will propose sourcing and
+            pricing.</div>
+        </div>
+        <a href="#contact"
+          class="inline-flex items-center justify-center rounded-full bg-green-400 px-6 py-3 text-sm font-bold text-white hover:bg-emerald-900 transition">
+          Request a custom quote
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="py-16 sm:py-20 bg-slate-50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="reveal text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-green-700 sm:text-4xl">Services</h2>
+        <p class="mt-3 text-slate-600 max-w-2xl mx-auto">End-to-end trade support—from supplier discovery to final
+          delivery.</p>
+      </div>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="lift reveal rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200">
+          <div class="flex items-center gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-xl bg-forest/10"><i
+                class="fa-solid fa-magnifying-glass text-forest"></i></div>
+            <h3 class="text-lg text-green-700 font-bold">Supplier Sourcing</h3>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">Vetted suppliers aligned with quality, capacity, and compliance needs.
+          </p>
+        </div>
+
+        <div class="lift reveal rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200">
+          <div class="flex items-center gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-xl bg-forest/10"><i
+                class="fa-solid fa-file-signature text-forest"></i></div>
+            <h3 class="text-lg text-green-700 font-bold">Documentation</h3>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">Invoices, packing lists, COA, MSDS support and export documentation
+            readiness.</p>
+        </div>
+
+        <div class="lift reveal rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200">
+          <div class="flex items-center gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-xl bg-forest/10"><i
+                class="fa-solid fa-ship text-forest"></i></div>
+            <h3 class="text-lg text-green-700 font-bold">Ocean Freight</h3>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">FCL / LCL planning with competitive routing and transparent ETAs.</p>
+        </div>
+
+        <div class="lift reveal rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200">
+          <div class="flex items-center gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-xl bg-forest/10"><i
+                class="fa-solid fa-plane text-forest"></i></div>
+            <h3 class="text-lg text-green-700 font-bold">Air Freight</h3>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">Time-critical shipments with tracking and handling coordination.</p>
+        </div>
+
+        <div class="lift reveal rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200">
+          <div class="flex items-center gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-xl bg-forest/10"><i
+                class="fa-solid fa-building-shield text-forest"></i></div>
+            <h3 class="text-lg text-green-700 font-bold">Customs Support</h3>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">Broker coordination, HS support, and compliance-first execution.</p>
+        </div>
+
+        <div class="lift reveal rounded-2xl bg-white p-7 shadow-sm ring-1 ring-slate-200">
+          <div class="flex items-center gap-3">
+            <div class="grid h-11 w-11 place-items-center rounded-xl bg-forest/10"><i
+                class="fa-solid fa-warehouse text-forest"></i></div>
+            <h3 class="text-lg text-green-700 font-bold">Warehousing</h3>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">Short-term storage and consolidation planning based on your supply
+            flow.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GLOBAL REACH -->
+  <section id="reach" class="py-16 sm:py-20 bg-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="reveal flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+        <div class="lg:max-w-xl">
+          <h2 class="text-3xl font-bold tracking-tight text-green-700 sm:text-4xl">Global Reach</h2>
+          <p class="mt-3 text-slate-600">We coordinate shipments across major trade lanes with partner coverage in key
+            regions.</p>
+
+          <div class="mt-6 grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl bg-slate-50 ring-1 ring-slate-200 p-5">
+              <div class="text-sm font-bold text-green-700">Regions Served</div>
+              <div class="mt-2 space-y-1 text-sm text-slate-600">
+                <div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-forest"></span>North America
+                </div>
+                <div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-forest"></span>Europe</div>
+                <div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-forest"></span>Middle East
+                </div>
+                <div class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-forest"></span>Asia-Pacific
+                </div>
+              </div>
+            </div>
+            <div class="rounded-2xl bg-slate-50 ring-1 ring-slate-200 p-5">
+              <div class="text-sm font-bold text-green-700">What you get</div>
+              <div class="mt-2 space-y-2 text-sm text-slate-600">
+                <div class="flex items-start gap-2"><i class="fa-solid fa-check mt-0.5 text-forest"></i><span>Clear
+                    shipment milestones and ETAs</span></div>
+                <div class="flex items-start gap-2"><i class="fa-solid fa-check mt-0.5 text-forest"></i><span>Supplier &
+                    freight coordination</span></div>
+                <div class="flex items-start gap-2"><i
+                    class="fa-solid fa-check mt-0.5 text-forest"></i><span>Documentation-first execution</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal lg:w-[520px]">
+          <div class="rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-gradient-to-br from-slate-50 to-white">
+            <div class="p-6 sm:p-7">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold text-slate-500">Coverage Map (Placeholder)</div>
+                  <div class="text-xl font-bold text-green-700">Trade Lanes Overview</div>
+                </div>
+                <span class="rounded-full bg-gold px-3 py-1 text-xs font-bold text-green-700"><i
+                    class="fa-solid fa-globe mr-2"></i>Worldwide</span>
+              </div>
+
+              <div class="mt-5 rounded-xl bg-slate-900/5 ring-1 ring-slate-200 h-64 grid place-items-center">
+                <iframe title="Kosmos Exim — Office Location" class="absolute h-64 w-full" frameborder="0"
+                  scrolling="no" marginheight="0" marginwidth="0" loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  src="https://maps.google.com/maps?width=600&amp;height=400&amp;hl=en&amp;q=Parsik Nagar Kalwa, Thane, 400605&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">
+                </iframe>
+              </div>
+
+              <div class="mt-5 grid grid-cols-3 gap-3">
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 p-4 text-center">
+                  <div class="text-2xl font-extrabold text-green-700"><span class="count" data-target="50">0</span>+
+                  </div>
+                  <div class="text-xs font-semibold text-slate-600">Countries</div>
+                </div>
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 p-4 text-center">
+                  <div class="text-2xl font-extrabold text-green-700"><span class="count" data-target="500">0</span>+
+                  </div>
+                  <div class="text-xs font-semibold text-slate-600">Clients</div>
+                </div>
+                <div class="rounded-xl bg-white ring-1 ring-slate-200 p-4 text-center">
+                  <div class="text-2xl font-extrabold text-green-700"><span class="count" data-target="1000">0</span>+
+                  </div>
+                  <div class="text-xs font-semibold text-slate-600">Shipments</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS STRIP -->
+  <section id="stats" class="bg-forest py-12">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid gap-8 text-center sm:grid-cols-3">
+        <div class="reveal">
+          <div class="text-4xl sm:text-5xl font-extrabold text-white"><span class="count" data-target="50">0</span>+
+          </div>
+          <div class="mt-2 text-white/80 font-semibold">Countries Reached</div>
+        </div>
+        <div class="reveal">
+          <div class="text-4xl sm:text-5xl font-extrabold text-white"><span class="count" data-target="500">0</span>+
+          </div>
+          <div class="mt-2 text-white/80 font-semibold">Happy Clients</div>
+        </div>
+        <div class="reveal">
+          <div class="text-4xl sm:text-5xl font-extrabold text-white"><span class="count" data-target="1000">0</span>+
+          </div>
+          <div class="mt-2 text-white/80 font-semibold">Successful Shipments</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA (Parallax) -->
+  <section class="cta-bg relative py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="reveal rounded-3xl bg-white/10 ring-1 ring-white/15 backdrop-blur-md p-8 sm:p-10 text-center">
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Ready to Expand Your Global Trade?</h2>
+        <p class="mt-3 text-white/80 max-w-2xl mx-auto">Get transparent quotes, accurate lead times, and a team that
+          executes with discipline.</p>
+        <div class="mt-8 flex flex-col sm:flex-row justify-center gap-3">
+          <a href="#contact"
+            class="inline-flex items-center justify-center rounded-full bg-green-400 px-7 py-3 text-sm font-bold text-forest hover:brightness-95">
+            Get Started
+          </a>
+          <a href="#services"
+            class="inline-flex items-center justify-center rounded-full bg-white/10 px-7 py-3 text-sm font-semibold text-white ring-1 ring-white/20 hover:bg-white/15">
+            View Services
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="bg-slate-50 py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="reveal text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-green-700 sm:text-4xl">Contact</h2>
+        <p class="mt-3 text-slate-600 max-w-2xl mx-auto">Send your requirements and we’ll respond with the best route,
+          pricing, and timelines.</p>
+      </div>
+
+      <div class="mt-12 grid gap-8 lg:grid-cols-2">
+        <!-- Form -->
+        <div class="reveal rounded-2xl bg-white p-7 sm:p-8 shadow-sm ring-1 ring-slate-200">
+          <form id="contactForm" class="grid gap-5">
+            <!-- Honeypot (anti-spam) -->
+            <input type="text" name="_honey" class="hidden" tabindex="-1" autocomplete="off" />
+            <div>
+              <label for="name" class="block text-sm font-semibold text-slate-800">Full Name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required
+                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-forest focus:ring-4 focus:ring-forest/15"
+                placeholder="Enter your name" />
+            </div>
+
+            <div>
+              <label for="location" class="block text-sm font-semibold text-slate-800">Current Location</label>
+              <input id="location" name="location" type="location" autocomplete="location" required
+                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-forest focus:ring-4 focus:ring-forest/15"
+                placeholder="Enter your Location" />
+            </div>
+
+            <div>
+              <label for="interest" class="block text-sm font-semibold text-slate-800">Product Interest</label>
+              <select id="interest" name="interest" required
+                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-forest focus:ring-4 focus:ring-forest/15">
+                <option value="" selected>Select a category</option>
+                <option value="Agriculture">Agri Products</option>
+                <option value="Spices">Fruits</option>
+                <option value="Processed">Pulses | Legumes</option>
+                <option value="Spices">Spices</option>
+                <option value="Processed">Processed Food</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="message" class="block text-sm font-semibold text-slate-800">Message</label>
+              <textarea id="message" name="message" rows="5" required
+                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-forest focus:ring-4 focus:ring-forest/15"
+                placeholder="Tell us your requirements (product, quantity, destination, target timeline)"></textarea>
+            </div>
+
+            <div class="grid gap-3 sm:grid-cols-2">
+              <button type="submit"
+                class="inline-flex items-center justify-center rounded-xl bg-yellow-400 px-5 py-3 text-sm font-bold text-black hover:bg-emerald-900 transition">
+                Send Message
+                <i class="fa-solid fa-paper-plane ml-2"></i>
+              </button>
+              <a id="whatsAppBtn" href="https://wa.me/+919209525715" target="_blank" rel="noreferrer"
+                class="inline-flex items-center justify-center rounded-xl bg-green-500 px-5 py-3 text-sm font-bold text-white hover:bg-green-600 transition">
+                WhatsApp Us
+                <i class="fa-brands fa-whatsapp ml-2 text-base"></i>
+              </a>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Contact details + Map -->
+        <div class="reveal rounded-2xl bg-white p-7 sm:p-8 shadow-sm ring-1 ring-slate-200">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3 class="text-xl font-bold text-green-700">Get in touch</h3>
+              <p class="mt-2 text-sm text-slate-600">Prefer email or phone? Use the details below.</p>
+            </div>
+            <div class="rounded-full bg-gold px-3 py-1 text-xs font-bold text-forest">Response in 24–48h</div>
+          </div>
+
+          <div class="mt-6 grid gap-4">
+            <div class="rounded-xl bg-slate-50 ring-1 ring-slate-200 p-5">
+              <div class="flex items-start gap-3">
+                <div class="grid h-10 w-10 place-items-center rounded-lg bg-green-400 text-white"><i
+                    class="fa-solid fa-location-dot"></i></div>
+                <div>
+                  <div class="text-sm font-bold text-slate-900">Office</div>
+                  <div class="text-sm text-slate-600">Saraswati Appt, Parsik Nagar Kalwa<br />Thane,
+                    MH-400605, India</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-xl bg-slate-50 ring-1 ring-slate-200 p-5">
+              <div class="flex items-start gap-3">
+                <div class="grid h-10 w-10 place-items-center rounded-lg bg-green-400 text-white"><i
+                    class="fa-solid fa-phone"></i></div>
+                <div>
+                  <div class="text-sm font-bold text-slate-900">Phone</div>
+                  <div class="text-sm text-slate-600">+91 9209525715</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-xl bg-slate-50 ring-1 ring-slate-200 p-5">
+              <div class="flex items-start gap-3">
+                <div class="grid h-10 w-10 place-items-center rounded-lg bg-green-400 text-white"><i
+                    class="fa-solid fa-envelope"></i></div>
+                <div>
+                  <div class="text-sm font-bold text-slate-900">Email</div>
+                  <div class="text-sm text-slate-600">kosmosexim58575@gmail.com</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white">
+              <div class="relative w-full h-56 sm:h-64">
+                <iframe title="Kosmos Exim — Office Location" class="absolute inset-0 h-full w-full" frameborder="0"
+                  scrolling="no" marginheight="0" marginwidth="0" loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  src="https://maps.google.com/maps?width=600&amp;height=400&amp;hl=en&amp;q=Parsik Nagar Kalwa, Thane, 400605&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">
+                </iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast -->
+      <div id="toast" class="fixed bottom-6 left-1/2 z-[60] hidden -translate-x-1/2">
+        <div
+          class="rounded-full bg-slate-900 text-white px-5 py-3 text-sm font-semibold shadow-xl ring-1 ring-white/10">
+          Message sent (demo). We’ll get back to you shortly.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-green-900 text-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-white/10 ring-1 ring-white/15">
+              <img src="https://i.ibb.co/BHcDddLg/Chat-GPT-Image-Jan-10-2026-10-29-02-PM.png">
+            </div>
+            <div class="font-bold text-lg">Kosmos <span class="text-gold">Exim</span></div>
+          </div>
+          <p class="mt-4 text-sm text-white/75">Global sourcing and import/export coordination built for reliability and
+            scale.</p>
+          <div class="mt-5 flex items-center gap-3">
+            <a href="https://www.facebook.com/profile.php?id=61586523302150" target="_blank"
+              class="grid h-10 w-10 place-items-center rounded-full bg-white/10 ring-1 ring-white/15 hover:bg-white/15"
+              aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://www.linkedin.com/in/kosmosexim/" target="_blank"
+              class="grid h-10 w-10 place-items-center rounded-full bg-white/10 ring-1 ring-white/15 hover:bg-white/15"
+              aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/kosmosexim/" target="_blank"
+              class="grid h-10 w-10 place-items-center rounded-full bg-white/10 ring-1 ring-white/15 hover:bg-white/15"
+              aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold tracking-wide text-white">Quick Links</h3>
+          <ul class="mt-4 space-y-2 text-sm text-white/75">
+            <li><a class="hover:text-white" href="#home">Home</a></li>
+            <li><a class="hover:text-white" href="#products">Products</a></li>
+            <li><a class="hover:text-white" href="#services">Services</a></li>
+            <li><a class="hover:text-white" href="#reach">Global Reach</a></li>
+            <li><a class="hover:text-white" href="#contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold tracking-wide text-white">Contact</h3>
+          <ul class="mt-4 space-y-2 text-sm text-white/75">
+            <li class="flex items-center gap-2"><i class="fa-solid fa-phone text-gold"></i> +91 9209525715</li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-gold"></i> kosmosexim58575@gmail.com
+            </li>
+            <li class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-gold"></i> Mumbai, India</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-bold tracking-wide text-white">Newsletter</h3>
+          <p class="mt-4 text-sm text-white/75">Trade updates and market insights—no spam.</p>
+          <form id="newsletterForm" class="mt-4 flex gap-2">
+            <!-- Honeypot -->
+            <input type="text" name="_honey" class="hidden" tabindex="-1" autocomplete="off">
+            <input type="email" name="subscriber_email" required placeholder="Your email"
+              class="w-full rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15 focus:ring-4 focus:ring-gold/25" />
+            <button type="submit" class="rounded-xl bg-gold px-4 py-3 text-sm font-bold text-forest hover:brightness-95"
+              aria-label="Subscribe">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="border-t border-white/10 py-8 text-center text-sm text-white/65">
+        <p>© <span id="year"></span> Kosmos Exim. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile drawer
+    const mobileBtn = document.getElementById('mobileBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+
+    function setMobileExpanded(expanded) {
+      mobileBtn.setAttribute('aria-expanded', String(expanded));
+    }
+
+    mobileBtn.addEventListener('click', () => {
+      const isHidden = mobileDrawer.classList.contains('hidden');
+      mobileDrawer.classList.toggle('hidden');
+      setMobileExpanded(isHidden);
+    });
+
+    // Navbar scroll effect + link color switching
+    const navbar = document.getElementById('navbar');
+    const brandTextEls = navbar.querySelectorAll('a, .nav-link');
+
+    const setNavMode = () => {
+      const scrolled = window.scrollY > 30;
+      navbar.classList.toggle('nav-solid', scrolled);
+      navbar.classList.toggle('nav-transparent', !scrolled);
+
+      // When solid, switch to dark text for readability
+      navbar.querySelectorAll('.nav-link').forEach(a => {
+        if (scrolled) {
+          a.classList.remove('text-white/90', 'hover:text-white');
+          a.classList.add('text-slate-700', 'hover:text-forest');
+        } else {
+          a.classList.add('text-white/90', 'hover:text-white');
+          a.classList.remove('text-slate-700', 'hover:text-forest');
+        }
+      });
+
+      // Brand text
+      const brand = navbar.querySelector('a[aria-label="Kosmos Exim home"] .text-base');
+      if (brand) {
+        if (scrolled) {
+          brand.classList.remove('text-white');
+          brand.classList.add('text-forest');
+        } else {
+          brand.classList.add('text-white');
+          brand.classList.remove('text-forest');
+        }
+      }
+    };
+
+    setNavMode();
+    window.addEventListener('scroll', setNavMode);
+
+    // Smooth scrolling (close mobile drawer)
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const href = a.getAttribute('href');
+        if (!href || href === '#') return;
+
+        const el = document.querySelector(href);
+        if (!el) return;
+
+        e.preventDefault();
+        const top = el.getBoundingClientRect().top + window.scrollY - 76;
+        window.scrollTo({ top, behavior: 'smooth' });
+
+        // close mobile
+        if (!mobileDrawer.classList.contains('hidden')) {
+          mobileDrawer.classList.add('hidden');
+          setMobileExpanded(false);
+        }
+      });
+    });
+
+    // Reveal on scroll
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => revealObs.observe(el));
+
+    // Counters (animate once)
+    const counters = document.querySelectorAll('.count');
+    const format = new Intl.NumberFormat('en-US');
+    let countersAnimated = false;
+
+    const animateCounter = (node) => {
+      const target = Number(node.getAttribute('data-target')) || 0;
+      const duration = 900; // ms
+      const start = performance.now();
+
+      const tick = (now) => {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const value = Math.floor(eased * target);
+        node.textContent = format.format(value);
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+
+    const statsEl = document.getElementById('stats');
+    const counterObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !countersAnimated) {
+          countersAnimated = true;
+          counters.forEach(animateCounter);
+          counterObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    counterObs.observe(statsEl);
+
+    // Products filter
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const productCards = document.querySelectorAll('.product-card');
+
+    const setActiveFilterBtn = (btn) => {
+      filterBtns.forEach(b => {
+        b.classList.remove('bg-forest', 'text-white', 'font-bold');
+        b.classList.add('bg-slate-100', 'text-slate-800', 'font-semibold');
+      });
+      btn.classList.add('bg-forest', 'text-white', 'font-bold');
+      btn.classList.remove('bg-slate-100', 'text-slate-800', 'font-semibold');
+    };
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.getAttribute('data-filter');
+        setActiveFilterBtn(btn);
+        productCards.forEach(card => {
+          const cat = card.getAttribute('data-category');
+          const show = filter === 'all' || cat === filter;
+          card.style.display = show ? '' : 'none';
+        });
+      });
+    });
+
+    // Toast helper
+    const toast = document.getElementById('toast');
+    const toastBox = toast.querySelector('div');
+    const defaultToastText = toastBox.textContent;
+    let toastTimer = null;
+
+    const showToast = (text, ms = 3200) => {
+      toastBox.textContent = text;
+      toast.classList.remove('hidden');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+        toastBox.textContent = defaultToastText;
+      }, ms);
+    };
+
+    // Contact form (EmailJS — no backend required)
+    // IMPORTANT:
+    // 1) Create EmailJS account: https://www.emailjs.com/
+    // 2) Add an Email Service (Gmail) and an Email Template
+    // 3) Paste your IDs/Key below
+    const EMAILJS_PUBLIC_KEY = 'M3Y1jkDhtGrxx4eGk';
+    const EMAILJS_SERVICE_ID = 'service_yaxokss';
+    const EMAILJS_TEMPLATE_ID = 'template_yanplds';
+
+    // Initialize EmailJS
+    if (window.emailjs) {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+
+    const contactForm = document.getElementById('contactForm');
+    const contactSubmitBtn = contactForm.querySelector('button[type="submit"]');
+
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Use native browser validation UI
+      if (!contactForm.reportValidity()) return;
+
+      // Honeypot check (bots fill hidden field)
+      const honey = contactForm.querySelector('input[name="company"]');
+      if (honey && honey.value.trim() !== '') {
+        showToast('Could not send. Please try again.');
+        return;
+      }
+
+      contactSubmitBtn.disabled = true;
+      contactSubmitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+      showToast('Sending your message…', 1600);
+
+      try {
+        // Sends the form fields to EmailJS based on your template variables
+        await emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, contactForm);
+
+        showToast('Message sent! We’ll reply to you soon.');
+        contactForm.reset();
+      } catch (err) {
+        console.error('EmailJS error:', err);
+        showToast('Could not send. Please try again or WhatsApp us.');
+      } finally {
+        contactSubmitBtn.disabled = false;
+        contactSubmitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+      }
+    });
+
+    const newsletterForm = document.getElementById('newsletterForm');
+
+    newsletterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Honeypot
+      const honey = newsletterForm.querySelector('input[name="_honey"]');
+      if (honey && honey.value.trim() !== '') return;
+
+      showToast('Subscribing…', 1500);
+
+      try {
+        await emailjs.sendForm(
+          EMAILJS_SERVICE_ID,
+          'template_n12d7oe',
+          newsletterForm
+        );
+
+        showToast('Subscribed successfully! 🎉');
+        newsletterForm.reset();
+
+      } catch (err) {
+        console.error('Newsletter EmailJS error:', err);
+        showToast('Subscription failed. Please try again.');
+      }
+    });
+  </script>
+
+</body>
+
+</html>
