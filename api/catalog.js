@@ -1,3 +1,5 @@
+const { Redis } = require('@upstash/redis');
+
 const STORAGE_KEY = 'kexim:catalog:v1';
 
 const parseBody = (req) => {
@@ -12,52 +14,35 @@ const parseBody = (req) => {
   return req.body;
 };
 
-const kvConfig = () => {
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-  return { url, token };
-};
+const hasKvEnv = () => (
+  (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
+  || (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+);
 
-const kvCommand = async (args) => {
-  const { url, token } = kvConfig();
-  if (!url || !token) {
-    throw new Error('KV_NOT_CONFIGURED');
-  }
-
-  const path = args.map((part) => encodeURIComponent(String(part))).join('/');
-  const response = await fetch(`${url}/${path}`, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  if (!response.ok) {
-    throw new Error(`KV_REQUEST_FAILED_${response.status}`);
-  }
-
-  return response.json();
+const getRedis = () => {
+  if (!hasKvEnv()) return null;
+  return Redis.fromEnv();
 };
 
 module.exports = async (req, res) => {
+  const redis = getRedis();
+
   if (req.method === 'GET') {
     try {
-      const data = await kvCommand(['GET', STORAGE_KEY]);
-      const raw = data?.result;
-      if (!raw) {
-        res.status(200).json({ ok: true, catalog: null });
-        return;
-      }
-      try {
-        res.status(200).json({ ok: true, catalog: JSON.parse(raw) });
-      } catch {
-        res.status(200).json({ ok: true, catalog: null });
-      }
-      return;
-    } catch (error) {
-      const message = String(error?.message || '');
-      if (message === 'KV_NOT_CONFIGURED') {
+      if (!redis) {
         res.status(200).json({ ok: true, catalog: null, warning: 'KV not configured' });
         return;
       }
+
+      const catalog = await redis.get(STORAGE_KEY);
+      if (!catalog) {
+        res.status(200).json({ ok: true, catalog: null });
+        return;
+      }
+
+      res.status(200).json({ ok: true, catalog });
+      return;
+    } catch (error) {
       res.status(500).json({ ok: false, error: 'Failed to read catalog' });
       return;
     }
@@ -73,15 +58,15 @@ module.exports = async (req, res) => {
     }
 
     try {
-      await kvCommand(['SET', STORAGE_KEY, JSON.stringify(catalog)]);
-      res.status(200).json({ ok: true });
-      return;
-    } catch (error) {
-      const message = String(error?.message || '');
-      if (message === 'KV_NOT_CONFIGURED') {
+      if (!redis) {
         res.status(503).json({ ok: false, error: 'KV not configured' });
         return;
       }
+
+      await redis.set(STORAGE_KEY, catalog);
+      res.status(200).json({ ok: true });
+      return;
+    } catch (error) {
       res.status(500).json({ ok: false, error: 'Failed to save catalog' });
       return;
     }
