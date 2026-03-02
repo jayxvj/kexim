@@ -102,6 +102,7 @@
 
   <script>
     const CATALOG_STORAGE_KEY = 'keximCatalogV1';
+    const CATALOG_SYNC_KEY = 'keximCatalogSyncTs';
     const SESSION_KEY = 'keximAdminSession';
 
     const loginView = document.getElementById('loginView');
@@ -440,6 +441,7 @@
       const next = normalizeCatalog({ filters, products });
       catalog = next;
       localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(next));
+      localStorage.setItem(CATALOG_SYNC_KEY, String(Date.now()));
       setStatus('Changes saved.');
     };
 
@@ -447,6 +449,7 @@
 
     resetBtn.addEventListener('click', () => {
       localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(defaultCatalog));
+      localStorage.setItem(CATALOG_SYNC_KEY, String(Date.now()));
       catalog = deepClone(defaultCatalog);
       renderAll();
       setStatus('Reset to default products and filters.');

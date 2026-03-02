@@ -1655,6 +1655,7 @@
 
     // Products catalog (single source shared with admin page)
     const CATALOG_STORAGE_KEY = 'keximCatalogV1';
+    const CATALOG_SYNC_KEY = 'keximCatalogSyncTs';
     const productFiltersWrap = document.getElementById('productFilters');
     const productsGrid = document.getElementById('productsGrid');
 
@@ -1837,6 +1838,22 @@
       localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(activeCatalog));
     }
     renderCatalog(activeCatalog);
+
+    const renderLatestCatalogFromStorage = () => {
+      const latest = tryParseCatalog(localStorage.getItem(CATALOG_STORAGE_KEY));
+      if (!latest) return;
+      renderCatalog(normalizeCatalog(latest));
+    };
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === CATALOG_STORAGE_KEY || event.key === CATALOG_SYNC_KEY) {
+        renderLatestCatalogFromStorage();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) renderLatestCatalogFromStorage();
+    });
 
     // Toast helper
     const toast = document.getElementById('toast');
