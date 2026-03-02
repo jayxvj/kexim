@@ -1655,6 +1655,7 @@
 
     // Products catalog (single source shared with admin page)
     const CATALOG_STORAGE_KEY = 'keximCatalogV1';
+    const CATALOG_API_URL = '/api/catalog';
     const CATALOG_SYNC_KEY = 'keximCatalogSyncTs';
     const productFiltersWrap = document.getElementById('productFilters');
     const productsGrid = document.getElementById('productsGrid');
@@ -1670,6 +1671,18 @@
         const parsed = JSON.parse(raw);
         if (!parsed || !Array.isArray(parsed.filters) || !Array.isArray(parsed.products)) return null;
         return parsed;
+      } catch {
+        return null;
+      }
+    };
+
+    const fetchRemoteCatalog = async () => {
+      try {
+        const response = await fetch(CATALOG_API_URL, { cache: 'no-store' });
+        if (!response.ok) return null;
+        const data = await response.json();
+        if (!data?.catalog || !Array.isArray(data.catalog.filters) || !Array.isArray(data.catalog.products)) return null;
+        return data.catalog;
       } catch {
         return null;
       }
@@ -1851,9 +1864,19 @@
       }
     });
 
+    const refreshCatalogFromServer = async () => {
+      const remote = await fetchRemoteCatalog();
+      if (!remote) return;
+      const normalized = normalizeCatalog(remote);
+      localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(normalized));
+      renderCatalog(normalized);
+    };
+
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) renderLatestCatalogFromStorage();
+      if (!document.hidden) refreshCatalogFromServer();
     });
+
+    refreshCatalogFromServer();
 
     // Toast helper
     const toast = document.getElementById('toast');

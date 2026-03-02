@@ -102,6 +102,7 @@
 
   <script>
     const CATALOG_STORAGE_KEY = 'keximCatalogV1';
+    const CATALOG_API_URL = '/api/catalog';
     const CATALOG_SYNC_KEY = 'keximCatalogSyncTs';
     const SESSION_KEY = 'keximAdminSession';
 
@@ -147,6 +148,31 @@
         return parsed;
       } catch {
         return null;
+      }
+    };
+
+    const fetchRemoteCatalog = async () => {
+      try {
+        const response = await fetch(CATALOG_API_URL, { cache: 'no-store' });
+        if (!response.ok) return null;
+        const data = await response.json();
+        if (!data?.catalog || !Array.isArray(data.catalog.filters) || !Array.isArray(data.catalog.products)) return null;
+        return data.catalog;
+      } catch {
+        return null;
+      }
+    };
+
+    const saveRemoteCatalog = async (next) => {
+      try {
+        const response = await fetch(CATALOG_API_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ catalog: next })
+        });
+        return response.ok;
+      } catch {
+        return false;
       }
     };
 
@@ -435,30 +461,42 @@
       setStatus('Product added to draft.');
     });
 
-    const saveDraft = () => {
+    const saveDraft = async () => {
       const filters = collectFiltersFromUi();
       const products = collectProductsFromUi(filters);
       const next = normalizeCatalog({ filters, products });
       catalog = next;
       localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(next));
       localStorage.setItem(CATALOG_SYNC_KEY, String(Date.now()));
-      setStatus('Changes saved.');
+      const remoteSaved = await saveRemoteCatalog(next);
+      if (remoteSaved) {
+        setStatus('Changes saved.');
+      } else {
+        setStatus('Saved locally. Configure KV to sync across browsers.', true);
+      }
     };
 
     saveBtn.addEventListener('click', saveDraft);
 
-    resetBtn.addEventListener('click', () => {
+    resetBtn.addEventListener('click', async () => {
       localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(defaultCatalog));
       localStorage.setItem(CATALOG_SYNC_KEY, String(Date.now()));
       catalog = deepClone(defaultCatalog);
       renderAll();
-      setStatus('Reset to default products and filters.');
+      const remoteSaved = await saveRemoteCatalog(defaultCatalog);
+      if (remoteSaved) {
+        setStatus('Reset to default products and filters.');
+      } else {
+        setStatus('Reset locally. Configure KV to sync across browsers.', true);
+      }
     });
 
     const init = async () => {
       defaultCatalog = await fetchDefaultCatalog();
+      const remote = await fetchRemoteCatalog();
       const stored = safeParse(localStorage.getItem(CATALOG_STORAGE_KEY));
-      catalog = normalizeCatalog(stored || defaultCatalog);
+      catalog = normalizeCatalog(remote || stored || defaultCatalog);
+      localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(catalog));
       renderAll();
 
       if (sessionStorage.getItem(SESSION_KEY) === '1') {
