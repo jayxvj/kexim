@@ -261,8 +261,9 @@
       rows.forEach((row) => {
         const idInput = row.querySelector('[data-key="id"]');
         const labelInput = row.querySelector('[data-key="label"]');
-        const id = slugify(idInput.value);
         const label = labelInput.value.trim();
+        const id = slugify(idInput.value || label);
+        if (!idInput.value.trim() && id) idInput.value = id;
         if (!id || !label || id === 'all' || seen.has(id)) return;
         seen.add(id);
         filters.push({ id, label });
@@ -314,8 +315,13 @@
           syncCategoryOptions();
         });
         const idInput = row.querySelector('[data-key="id"]');
+        const labelInput = row.querySelector('[data-key="label"]');
         idInput.addEventListener('change', () => {
           idInput.value = slugify(idInput.value);
+          syncCategoryOptions();
+        });
+        labelInput.addEventListener('blur', () => {
+          if (!idInput.value.trim()) idInput.value = slugify(labelInput.value);
           syncCategoryOptions();
         });
         filtersList.appendChild(row);
@@ -431,6 +437,11 @@
       });
       row.querySelector('[data-key="id"]').addEventListener('change', (e) => {
         e.target.value = slugify(e.target.value);
+        syncCategoryOptions();
+      });
+      row.querySelector('[data-key="label"]').addEventListener('blur', (e) => {
+        const idInput = row.querySelector('[data-key="id"]');
+        if (!idInput.value.trim()) idInput.value = slugify(e.target.value);
         syncCategoryOptions();
       });
       const empty = filtersList.querySelector('p');
