@@ -178,67 +178,22 @@
       text-wrap: balance;
     }
 
-    #productFiltersOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s ease;
-      z-index: 9990;
+    #productFiltersPanel {
+      position: absolute;
+      top: calc(100% + .5rem);
+      right: 0;
+      width: min(90vw, 34rem);
+      z-index: 9991;
       display: none;
     }
 
-    #productFiltersOverlay.is-open {
-      opacity: 1;
-      pointer-events: auto;
+    #productFiltersPanel.is-open {
       display: block;
     }
 
-    #productFiltersPanel {
-      position: fixed;
-      top: 0;
-      right: 0;
-      left: auto;
-      height: 100dvh;
-      width: min(88vw, 360px);
-      transform: translateX(104%);
-      transition: transform .24s ease;
-      z-index: 9991;
-      visibility: hidden;
-      pointer-events: none;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-      padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-    }
-
-    #productFiltersPanel.is-open {
-      transform: translateX(0);
-      visibility: visible;
-      pointer-events: auto;
-    }
-
-    @media (min-width: 768px) {
-      #productFiltersOverlay,
-      #productFiltersOverlay.is-open {
-        display: none !important;
-        pointer-events: none !important;
-      }
-
+    @media (max-width: 767px) {
       #productFiltersPanel {
-        position: absolute;
-        top: calc(100% + .5rem);
-        right: 0;
-        height: auto;
-        width: min(90vw, 34rem);
-        transform: none;
-        display: none;
-        z-index: 9991;
-      }
-
-      #productFiltersPanel.is-open {
-        display: block;
+        display: none !important;
       }
     }
   </style>
@@ -490,7 +445,20 @@
           <p class="mt-2 text-slate-600 max-w-2xl">Explore our key categories. Use filters to quickly find what you
             trade.</p>
         </div>
-        <div class="relative w-full md:ml-auto md:w-auto md:min-w-[24rem]">
+        <div class="w-full md:hidden">
+          <label for="mobileFilterSelect" class="mb-2 block text-sm font-semibold text-slate-700">Filter Categories</label>
+          <select id="mobileFilterSelect"
+            class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm focus:border-green-700 focus:ring-4 focus:ring-green-700/15">
+            <option value="all">All</option>
+            <option value="agri">Agriculture</option>
+            <option value="puge">Pulses</option>
+            <option value="spice">Spices</option>
+            <option value="process">Processed Foods</option>
+            <option value="texa">Textile Appearel</option>
+            <option value="texg">Textile Garments</option>
+          </select>
+        </div>
+        <div class="relative hidden w-full md:ml-auto md:block md:w-auto md:min-w-[24rem]">
           <button id="filterToggleBtn" type="button"
             class="inline-flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50 md:w-auto">
             <span class="inline-flex items-center gap-2">
@@ -500,10 +468,6 @@
             <span id="filterCurrentLabel" class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">All</span>
           </button>
           <div id="productFiltersPanel" class="rounded-2xl border border-slate-200 bg-white p-3 shadow-xl md:mt-2">
-            <div class="mb-3 flex items-center justify-between md:hidden">
-              <h3 class="text-sm font-bold text-slate-800">Filter Categories</h3>
-              <button id="filterCloseBtn" type="button" class="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-700">Close</button>
-            </div>
             <div id="productFilters" class="w-full" aria-label="Product category filters">
               <button class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-800"
                 data-filter="all"><span class="filter-label">All</span></button>
@@ -529,7 +493,6 @@
           </div>
         </div>
       </div>
-      <div id="productFiltersOverlay" aria-hidden="true"></div>
 
       <div id="productsGrid" class="relative z-0 mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 
@@ -1583,12 +1546,10 @@
     // Products filter (static DOM only)
     const productFiltersWrap = document.getElementById('productFilters');
     const productFiltersPanel = document.getElementById('productFiltersPanel');
-    const productFiltersOverlay = document.getElementById('productFiltersOverlay');
     const filterToggleBtn = document.getElementById('filterToggleBtn');
-    const filterCloseBtn = document.getElementById('filterCloseBtn');
+    const mobileFilterSelect = document.getElementById('mobileFilterSelect');
     const filterCurrentLabel = document.getElementById('filterCurrentLabel');
     const productsGrid = document.getElementById('productsGrid');
-    const desktopFiltersMq = window.matchMedia('(min-width: 768px)');
 
     const setActiveFilterBtn = (btn) => {
       const buttons = productFiltersWrap.querySelectorAll('.filter-btn');
@@ -1600,6 +1561,9 @@
       btn.classList.remove('bg-slate-100', 'text-slate-800', 'font-semibold');
       if (filterCurrentLabel) {
         filterCurrentLabel.textContent = btn.textContent.trim();
+      }
+      if (mobileFilterSelect) {
+        mobileFilterSelect.value = btn.getAttribute('data-filter') || 'all';
       }
     };
 
@@ -1622,23 +1586,26 @@
           closeFiltersPanel();
         });
       });
+      if (mobileFilterSelect) {
+        mobileFilterSelect.addEventListener('change', () => {
+          const filterId = mobileFilterSelect.value || 'all';
+          const matchBtn = productFiltersWrap.querySelector(`.filter-btn[data-filter="${filterId}"]`)
+            || productFiltersWrap.querySelector('.filter-btn[data-filter="all"]');
+          if (matchBtn) setActiveFilterBtn(matchBtn);
+          applyFilter(filterId);
+        });
+      }
     };
 
     const openFiltersPanel = () => {
       productFiltersPanel.classList.add('is-open');
-      productFiltersOverlay.classList.add('is-open');
-      if (!desktopFiltersMq.matches) {
-        document.body.style.overflow = 'hidden';
-      }
     };
 
     const closeFiltersPanel = () => {
       productFiltersPanel.classList.remove('is-open');
-      productFiltersOverlay.classList.remove('is-open');
-      document.body.style.overflow = '';
     };
 
-    if (filterToggleBtn && productFiltersPanel && productFiltersOverlay) {
+    if (filterToggleBtn && productFiltersPanel) {
       filterToggleBtn.addEventListener('click', (event) => {
         event.stopPropagation();
         if (productFiltersPanel.classList.contains('is-open')) {
@@ -1647,22 +1614,10 @@
           openFiltersPanel();
         }
       });
-      if (filterCloseBtn) {
-        filterCloseBtn.addEventListener('click', closeFiltersPanel);
-      }
       productFiltersPanel.addEventListener('click', (event) => event.stopPropagation());
-      productFiltersOverlay.addEventListener('click', closeFiltersPanel);
-      document.addEventListener('click', (event) => {
-        if (!desktopFiltersMq.matches) return;
-        const insideMenu = productFiltersPanel.contains(event.target);
-        const onToggle = filterToggleBtn.contains(event.target);
-        if (!insideMenu && !onToggle) closeFiltersPanel();
-      });
+      document.addEventListener('click', closeFiltersPanel);
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') closeFiltersPanel();
-      });
-      desktopFiltersMq.addEventListener('change', () => {
-        closeFiltersPanel();
       });
     }
 
