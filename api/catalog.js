@@ -37,8 +37,22 @@ module.exports = async (req, res) => {
         return;
       }
 
-      const catalog = await redis.get(STORAGE_KEY);
-      if (!catalog) {
+      const stored = await redis.get(STORAGE_KEY);
+      if (!stored) {
+        res.status(200).json({ ok: true, catalog: null });
+        return;
+      }
+
+      let catalog = stored;
+      if (typeof stored === 'string') {
+        try {
+          catalog = JSON.parse(stored);
+        } catch {
+          catalog = null;
+        }
+      }
+
+      if (!catalog || !Array.isArray(catalog.filters) || !Array.isArray(catalog.products)) {
         res.status(200).json({ ok: true, catalog: null });
         return;
       }
@@ -66,7 +80,7 @@ module.exports = async (req, res) => {
         return;
       }
 
-      await redis.set(STORAGE_KEY, catalog);
+      await redis.set(STORAGE_KEY, JSON.stringify(catalog));
       res.status(200).json({ ok: true });
       return;
     } catch (error) {
