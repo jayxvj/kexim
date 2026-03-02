@@ -151,6 +151,33 @@
       padding: 1px;
       border-radius: 16px;
     }
+
+    /* Product filter buttons: equal width/height even for long category names */
+    #productFilters {
+      width: min(100%, 56rem);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.55rem;
+      align-items: stretch;
+    }
+
+    #productFilters .filter-btn {
+      width: 100%;
+      min-height: 44px;
+      padding: 0.55rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    #productFilters .filter-label {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-wrap: balance;
+    }
   </style>
 </head>
 
@@ -400,24 +427,24 @@
           <p class="mt-2 text-slate-600 max-w-2xl">Explore our key categories. Use filters to quickly find what you
             trade.</p>
         </div>
-        <div id="productFilters" class="flex flex-wrap gap-2" aria-label="Product category filters">
+        <div id="productFilters" class="w-full" aria-label="Product category filters">
           <button class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-800"
-            data-filter="all">All</button>
+            data-filter="all"><span class="filter-label">All</span></button>
           <button
             class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
-            data-filter="agri">Agriculture</button>
+            data-filter="agri"><span class="filter-label">Agriculture</span></button>
           <button
             class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
-            data-filter="fruit">Fruits</button>
+            data-filter="fruit"><span class="filter-label">Fruits</span></button>
           <button
             class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
-            data-filter="puge">Pulses | Legumes</button>
+            data-filter="puge"><span class="filter-label">Pulses | Legumes</span></button>
           <button
             class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
-            data-filter="spice">Spices</button>
+            data-filter="spice"><span class="filter-label">Spices</span></button>
           <button
             class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-green-200"
-            data-filter="process">Processed</button>
+            data-filter="process"><span class="filter-label">Processed</span></button>
         </div>
       </div>
 
@@ -1730,22 +1757,34 @@
     const parsedStoredCatalog = tryParseCatalog(localStorage.getItem(CATALOG_STORAGE_KEY));
     const storedCatalog = parsedStoredCatalog ? normalizeCatalog(parsedStoredCatalog) : null;
 
+    const escapeHtml = (value) => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    const sanitizeUrl = (value) => String(value ?? '')
+      .replace(/[\r\n]/g, '')
+      .replace(/'/g, '%27')
+      .trim();
+
     const productCardHtml = (product) => `
-      <article class="product-card lift reveal is-visible rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white" data-category="${product.category}">
-        <div class="h-44 bg-cover bg-center" style="background-image: url('${product.imageUrl || ''}');"></div>
+      <article class="product-card lift reveal is-visible rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white" data-category="${escapeHtml(product.category)}">
+        <div class="h-44 bg-cover bg-center" style="background-image: url('${sanitizeUrl(product.imageUrl)}');"></div>
         <div class="p-6">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold text-green-700">${product.title || ''}</h3>
-            <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">${product.tag || ''}</span>
+            <h3 class="text-lg font-bold text-green-700">${escapeHtml(product.title)}</h3>
+            <span class="rounded-full bg-slate-700/10 px-3 py-1 text-xs font-semibold text-slate-700">${escapeHtml(product.tag)}</span>
           </div>
-          <p class="mt-2 text-sm text-slate-600">${product.description || ''}</p>
+          <p class="mt-2 text-sm text-slate-600">${escapeHtml(product.description)}</p>
         </div>
       </article>
     `;
 
     const filterBtnHtml = (filter, isFirst) => `
-      <button class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm ${isFirst ? 'font-bold' : 'font-semibold'} text-slate-800 hover:bg-green-200" data-filter="${filter.id}">
-        ${filter.label}
+      <button class="filter-btn rounded-full bg-slate-100 px-4 py-2 text-sm ${isFirst ? 'font-bold' : 'font-semibold'} text-slate-800 hover:bg-green-200" data-filter="${escapeHtml(filter.id)}">
+        <span class="filter-label">${escapeHtml(filter.label)}</span>
       </button>
     `;
 
